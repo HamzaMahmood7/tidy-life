@@ -36,3 +36,17 @@ a {
 .active {
   color: orange;
 }
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(244, 239, 239);
+  color: orange;
+  padding: 10px;
+}
+
+label {
+  margin: 5px;
+}
