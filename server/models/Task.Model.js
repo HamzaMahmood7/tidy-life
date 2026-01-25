@@ -26,19 +26,20 @@ const taskSchema =
         type: Date,
         default: null
     },
-    assignedUser: {
+    assignedUserIds: [{
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
-    },
+    }],
     assignedGroup: {
         type: Schema.Types.ObjectId,
-        ref: '',
-        default: null
+        ref: 'Group',
+        default: null // null = personal task
     },
     createdBy: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     },
     completedAt: {
         type: Date,

@@ -4,28 +4,45 @@ const userSchema = new Schema(
   {
     email: {
       type: String,
-      required: [true, 'Email is required.'],
+      required: [true, "Email is required."],
       unique: true,
       lowercase: true,
-      trim: true
+      trim: true,
     },
     password: {
       type: String,
-      required: [true, 'Password is required.']
+      required: [true, "Password is required."],
     },
-    username: { 
+    username: {
       type: String,
-      required: [true, 'Username is required.'],
-      unique: true
-    }, 
+      required: [true, "Username is required."],
+      unique: true,
+    },
     profilePicture: {
       type: String,
-    }   
+    },
+    groups: [
+      {
+        groupId: {
+          type: Schema.Types.ObjectId,
+          ref: "Group",
+        },
+        role: {
+          type: String,
+          enum: ["owner", "admin", "member"],
+          default: "member",
+        },
+        joinedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
-    // this second object adds extra properties: `createdAt` and `updatedAt`    
-    timestamps: true
-  }
+    // this second object adds extra properties: `createdAt` and `updatedAt`
+    timestamps: true,
+  },
 );
 
 const User = model("User", userSchema);
