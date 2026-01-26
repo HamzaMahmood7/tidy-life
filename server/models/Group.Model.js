@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const groupSchema =
-  ({
+const groupSchema = new Schema(
+  {
     groupName: {
       type: String,
       required: true,
@@ -33,7 +33,8 @@ const groupSchema =
   },
   {
     timestamps: true,
-  });
+  },
+);
 
 const Group = mongoose.model("Group", groupSchema);
 
