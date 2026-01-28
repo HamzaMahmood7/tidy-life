@@ -15,4 +15,19 @@ router.get('/all-users', isAuthenticated, async(req, res) => {
     }
 })
 
+// route to search for users in the DB
+router.get('/search', isAuthenticated, async(req, res) => {
+  try {
+    const users = await UserModel.find({
+        username: {$regex: req.query.username, $options: "i"},
+        _id : { $ne: req.payload._id}
+    }).select("username _id");
+    console.log('searched users', users)
+    res.status(200).json(users)
+  } catch (error) {
+    console.log(error);
+      res.status(500).json({ errorMessage: "Could not find users" });
+  }
+})
+
 module.exports = router

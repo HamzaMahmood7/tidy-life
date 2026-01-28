@@ -5,7 +5,19 @@ const GroupModel = require("../models/Group.Model");
 
 // route to create a group
 router.post("/create-group", isAuthenticated, (req, res) => {
-  GroupModel.create(req.body)
+  const ownerId = req.payload._id // get the id from the token
+
+  // force the creator to be included in the members list with the role of 'owner'
+  const finalMembers = [
+    ...req.body.members,
+    { userId: ownerId, role: "Owner"}
+  ];
+
+  GroupModel.create({
+    groupName: req.body.groupName,
+    createdBy: ownerId,
+    members: finalMembers
+  })
     .then((groupData) => {
       console.log("group was created! ", groupData);
       res.status(201).json(groupData);
@@ -22,8 +34,9 @@ router.get("/all-groups", isAuthenticated, (req, res) => {
   GroupModel.find({
     "members.userId": userId,
   })
-    .populate("createdBy", "username")
-    .populate("members.userId", "username")
+    .populate("createdBy", "username") // gets the group owners name
+    .populate("members.userId", "username") // gets the usernames for all members
+    .populate("tasks")
     .then((groupData) => {
       console.log(groupData);
       res.status(200).json(groupData);

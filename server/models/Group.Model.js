@@ -21,8 +21,8 @@ const groupSchema = new Schema(
         },
         role: {
           type: String,
-          enum: ["owner", "admin", "member"],
-          default: "member",
+          enum: ["Owner", "Admin", "Member"],
+          default: "Member",
         },
         joinedAt: {
           type: Date,
@@ -30,6 +30,12 @@ const groupSchema = new Schema(
         },
       },
     ],
+    tasks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Task"
+      }
+    ]
   },
   {
     timestamps: true,
