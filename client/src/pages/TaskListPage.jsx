@@ -17,7 +17,7 @@ const TaskListPage = () => {
     const fetchTasks = async () => {
       try {
         const tokenForAuth = localStorage.getItem("authToken");
-        const res = await axios.get("http://localhost:5005/task/all-tasks", {
+        const res = await axios.get(`${API_URL}/task/all-tasks`, {
           headers: {
             authorization: `Bearer ${tokenForAuth}`,
           },
@@ -44,7 +44,7 @@ const TaskListPage = () => {
         const tokenForAuth = localStorage.getItem("authToken");
 
         const deletedTaskRes = await axios.delete(
-          `http://localhost:5005/task/${taskId}`,
+          `${API_URL}/task/${taskId}`,
           {
             headers: {
               authorization: `Bearer ${tokenForAuth}`,

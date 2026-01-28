@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Select from "react-select";
+import { API_URL } from "../../config/config";
 
 const UpdateTaskPage = () => {
   const { taskId } = useParams();
@@ -33,9 +34,9 @@ const UpdateTaskPage = () => {
 
         const [usersResponse, groupsResponse, taskResponse] = await Promise.all(
           [
-            axios.get("http://localhost:5005/user/all-users", { headers }),
-            axios.get("http://localhost:5005/group/all-groups", { headers }),
-            axios.get(`http://localhost:5005/task/${taskId}`, { headers }),
+            axios.get(`${API_URL}/user/all-users`, { headers }),
+            axios.get(`${API_URL}/group/all-groups`, { headers }),
+            axios.get(`${API_URL}/task/${taskId}`, { headers }),
           ],
         );
 
@@ -97,7 +98,7 @@ const UpdateTaskPage = () => {
 
     try {
       const res = await axios.patch(
-        `http://localhost:5005/task/${taskId}`,
+        `${API_URL}/task/${taskId}`,
         updatedTask,
         {
           headers: { authorization: `Bearer ${tokenForAuth}` },

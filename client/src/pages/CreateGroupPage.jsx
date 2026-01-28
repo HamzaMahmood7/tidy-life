@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/config";
 
 const CreateGroupPage = () => {
   const [groupName, setGroupName] = useState("");
@@ -18,7 +19,7 @@ const CreateGroupPage = () => {
     try {
       const tokenForAuth = localStorage.getItem("authToken");
       const searchRes = await axios.get(
-        `http://localhost:5005/user/search?username=${e.target.value}`,
+        `${API_URL}/user/search?username=${e.target.value}`,
         {
           headers: { authorization: `Bearer ${tokenForAuth}` },
         },
@@ -53,7 +54,7 @@ const CreateGroupPage = () => {
       const tokenForAuth = localStorage.getItem("authToken");
 
       const createdGroupRes = await axios.post(
-        "http://localhost:5005/group/create-group",
+        `${API_URL}/group/create-group`,
         { groupName, members: membersList },
         { headers: { authorization: `Bearer ${tokenForAuth}` } },
       );

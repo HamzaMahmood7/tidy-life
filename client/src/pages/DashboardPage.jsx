@@ -4,6 +4,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import ReactConfetti from "react-confetti";
+import { API_URL } from "../../config/config";
 
 const DashboardPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -24,7 +25,7 @@ const DashboardPage = () => {
     const fetchTasks = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5005/task/dashboard-tasks",
+          `${API_URL}/task/dashboard-tasks`,
           {
             headers: {
               authorization: `Bearer ${tokenForAuth}`,
@@ -46,7 +47,7 @@ const DashboardPage = () => {
 
     const fetchGroups = async () => {
       try {
-        const res = await axios.get("http://localhost:5005/group/all-groups", {
+        const res = await axios.get(`${API_URL}/group/all-groups`, {
           headers: {
             authorization: `Bearer ${tokenForAuth}`,
           },
@@ -67,7 +68,7 @@ const DashboardPage = () => {
       const newStatus = currentStatus === "Completed" ? "To-do" : "Completed";
 
       const completedTaskRes = await axios.patch(
-        `http://localhost:5005/task/${taskId}`,
+        `${API_URL}/task/${taskId}`,
         { status: newStatus },
         { headers: { authorization: `Bearer ${tokenForAuth}` } },
       );

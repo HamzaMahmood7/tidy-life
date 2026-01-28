@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_URL } from "../../config/config";
 
 const GroupListPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -16,7 +17,7 @@ const GroupListPage = () => {
     const fetchGroups = async () => {
       try {
         const tokenForAuth = localStorage.getItem("authToken");
-        const res = await axios.get("http://localhost:5005/group/all-groups", {
+        const res = await axios.get(`${API_URL}/group/all-groups`, {
           headers: {
             Authorization: `Bearer ${tokenForAuth}`,
           },

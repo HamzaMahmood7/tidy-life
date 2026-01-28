@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
+import { API_URL } from "../../config/config";
 
 const CreateTaskPage = () => {
     const nav = useNavigate()
@@ -24,10 +25,10 @@ const CreateTaskPage = () => {
     const fetchUsersAndGroups = async () => {
       try {
         const [usersRes, groupsRes] = await Promise.all([
-          axios.get("http://localhost:5005/user/all-users", {
+          axios.get(`${API_URL}/user/all-users`, {
             headers: { authorization: `Bearer ${tokenForAuth}` },
           }),
-          axios.get("http://localhost:5005/group/all-groups", {
+          axios.get(`${API_URL}/group/all-groups`, {
             headers: { authorization: `Bearer ${tokenForAuth}` },
           }),
         ]);
@@ -80,7 +81,7 @@ const CreateTaskPage = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5005/task/create-task",
+        `${API_URL}/task/create-task`,
         newTask,
         {
           headers: {
