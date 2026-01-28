@@ -27,6 +27,9 @@ app.use('/task', taskRoutes)
 const groupRoutes = require('./routes/group.routes')
 app.use('/group', groupRoutes)
 
+const userRoutes = require('./routes/user.routes')
+app.use('/user', userRoutes)
+
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
 

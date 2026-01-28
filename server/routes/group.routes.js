@@ -1,9 +1,10 @@
 const router = require("express").Router();
 
+const { isAuthenticated } = require("../middlewares/jwt.middleware");
 const GroupModel = require("../models/Group.Model");
 
 // route to create a group
-router.post("/create-group", (req, res) => {
+router.post("/create-group", isAuthenticated, (req, res) => {
   GroupModel.create(req.body)
     .then((groupData) => {
       console.log("group was created! ", groupData);
@@ -16,9 +17,13 @@ router.post("/create-group", (req, res) => {
 });
 
 // route to get all group that the user is part of
-router.get("/all-groups", (req, res) => {
-  GroupModel.find()
-    .populate()
+router.get("/all-groups", isAuthenticated, (req, res) => {
+  const userId = req.payload._id;
+  GroupModel.find({
+    "members.userId": userId,
+  })
+    .populate("createdBy", "username")
+    .populate("members.userId", "username")
     .then((groupData) => {
       console.log(groupData);
       res.status(200).json(groupData);
@@ -32,7 +37,7 @@ router.get("/all-groups", (req, res) => {
 });
 
 // route to get a single group
-router.get("/:groupId", async (req, res) => {
+router.get("/:groupId", isAuthenticated, async (req, res) => {
   try {
     const oneGroup = await GroupModel.findById(req.params.groupId)
       .select()
@@ -46,7 +51,7 @@ router.get("/:groupId", async (req, res) => {
 });
 
 // route to update a group
-router.patch("/:groupId", async (req, res) => {
+router.patch("/:groupId", isAuthenticated, async (req, res) => {
   try {
     const updatedGroup = await GroupModel.findByIdAndUpdate(
       req.params.groupId,
@@ -64,7 +69,7 @@ router.patch("/:groupId", async (req, res) => {
 });
 
 // route to delete a group
-router.delete("/:groupId", (req, res) => {
+router.delete("/:groupId", isAuthenticated, (req, res) => {
   GroupModel.findByIdAndDelete(req.params.groupId)
     .then((groupData) => {
       console.log("deleted group: ", groupData);

@@ -1,0 +1,18 @@
+const router = require('express').Router()
+
+const UserModel = require('../models/User.Model')
+const { isAuthenticated } = require('../middlewares/jwt.middleware');
+
+// route to get all users
+router.get('/all-users', isAuthenticated, async(req, res) => {
+    try {
+        const users = await UserModel.find({}, "_id username");
+        console.log('got the users', users)
+        res.status(200).json(users)
+    } catch (error) {
+        console.error("Failed to get all users:", error);
+    res.status(500).json({ errorMessage: "Failed to get all users" });
+    }
+})
+
+module.exports = router
