@@ -3,6 +3,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
+import ReactConfetti from "react-confetti";
 
 const DashboardPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -11,6 +12,10 @@ const DashboardPage = () => {
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // react confetti state
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Auth token
   const tokenForAuth = localStorage.getItem("authToken");
 
   useEffect(() => {
@@ -58,6 +63,7 @@ const DashboardPage = () => {
 
   const handleToggleComplete = async (taskId, currentStatus) => {
     try {
+      const isChecking = currentStatus !== "Completed";
       const newStatus = currentStatus === "Completed" ? "To-do" : "Completed";
 
       const completedTaskRes = await axios.patch(
@@ -73,8 +79,14 @@ const DashboardPage = () => {
           return currentTask;
         }
       });
-
       setTasks(updatedTaskStatus);
+
+      if (isChecking) {
+        setShowConfetti(true);
+        setTimeout(() => {
+          setShowConfetti(false);
+        }, 5000);
+      }
     } catch (error) {
       console.log("could not update status");
       // toast.error('could not update task status')
@@ -86,6 +98,15 @@ const DashboardPage = () => {
   }
   return (
     <>
+      {showConfetti && (
+        <ReactConfetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false} // It fires once and stops
+          numberOfPieces={300}
+          gravity={0.3}
+        />
+      )}
       <div>
         <h1>Dashboard</h1>
         <h2>Hi {currentUser.username}</h2>
