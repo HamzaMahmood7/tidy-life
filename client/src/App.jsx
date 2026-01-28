@@ -7,10 +7,27 @@ import UserProfilePage from "./pages/UserProfilePage";
 import Footer from "./components/Footer";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardPage from "./pages/DashboardPage";
+import TaskListPage from "./pages/TaskListPage";
+import GroupListPage from "./pages/GroupListPage";
+import UpdateTaskPage from "./pages/UpdateTaskPage";
+import UpdateGroupPage from "./pages/UpdateGroupPage";
+import CreateTaskPage from "./pages/CreateTaskPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
     <>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        }}
+      />
       <Navbar />
       <main>
         <Routes>
@@ -24,6 +41,55 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/task-list"
+            element={
+              <ProtectedRoute>
+                <TaskListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/group-list"
+            element={
+              <ProtectedRoute>
+                <GroupListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-task"
+            element={
+              <ProtectedRoute>
+                <CreateTaskPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-task/:taskId"
+            element={
+              <ProtectedRoute>
+                <UpdateTaskPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update-group/:groupId"
+            element={
+              <ProtectedRoute>
+                <UpdateGroupPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>

@@ -20,7 +20,7 @@ const AuthWrapper = ({ children }) => {
           "http://localhost:5005/auth/verify",
           {
             headers: {
-              authorisation: `Bearer ${tokenInStorage}`,
+              authorization: `Bearer ${tokenInStorage}`,
             },
           },
         );
@@ -40,13 +40,12 @@ const AuthWrapper = ({ children }) => {
       setIsLoading(false);
       setIsLoggedIn(false);
       nav("/login");
-      console.log(loggedInUser.error);
+      console.log(error);
     }
   }
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
-    nav('/login')
   }
 
 

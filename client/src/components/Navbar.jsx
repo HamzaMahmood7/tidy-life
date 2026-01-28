@@ -8,10 +8,16 @@ const Navbar = () => {
 
   return (
     <nav>
-      <img src={Logo} alt="logo" />
+      <NavLink to={"/dashboard"}>
+        <img src={Logo} alt="logo" />
+      </NavLink>
+
       <h2>Tidy Life</h2>
       {isLoggedIn ? (
-        <button onClick={handleLogout}>Logout</button>
+        <section>
+          <NavLink to={"/profile"}>Profile</NavLink>
+          <button onClick={handleLogout}>Logout</button>
+        </section>
       ) : (
         <section>
           <NavLink to={"/"}>Sign Up</NavLink>

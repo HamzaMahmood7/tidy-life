@@ -26,7 +26,7 @@ const LoginPage = () => {
       // Store the auth token in local storage
       localStorage.setItem("authToken", createdUser.data.authToken);
       await authenticateUser()
-      nav("/profile");
+      nav("/dashboard");
     } catch (error) {
       console.log(error);
       setError(error.response.data.errorMessage);
