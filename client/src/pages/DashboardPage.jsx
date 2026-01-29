@@ -5,6 +5,15 @@ import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import ReactConfetti from "react-confetti";
 import { API_URL } from "../../config/config";
+import {
+  ArrowRight,
+  Calendar,
+  LayoutDashboard,
+  List,
+  Plus,
+  PlusCircle,
+  Users,
+} from "lucide-react";
 
 const DashboardPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -24,14 +33,11 @@ const DashboardPage = () => {
 
     const fetchTasks = async () => {
       try {
-        const res = await axios.get(
-          `${API_URL}/task/dashboard-tasks`,
-          {
-            headers: {
-              authorization: `Bearer ${tokenForAuth}`,
-            },
+        const res = await axios.get(`${API_URL}/task/dashboard-tasks`, {
+          headers: {
+            authorization: `Bearer ${tokenForAuth}`,
           },
-        );
+        });
         setTasks(res.data);
       } catch (error) {
         console.error("Failed to fetch tasks", error);
@@ -47,7 +53,7 @@ const DashboardPage = () => {
 
     const fetchGroups = async () => {
       try {
-        const res = await axios.get(`${API_URL}/group/all-groups`, {
+        const res = await axios.get(`${API_URL}/group/dashboard-groups`, {
           headers: {
             authorization: `Bearer ${tokenForAuth}`,
           },
@@ -109,87 +115,172 @@ const DashboardPage = () => {
         />
       )}
       <div>
-        <h1>Dashboard</h1>
-        <h2>Hi {currentUser.username}</h2>
+        <h1 className="page-title">
+          <LayoutDashboard size={28} /> Dashboard
+        </h1>
+        <h2 className="welcome-text">Hi {currentUser.username}</h2>
 
-        <h3>Your Data</h3>
+        <div className="section-header">
+          <h3>
+            <List size={20} /> Your Tasks
+          </h3>
+          <Link to={"/create-task"} className="add-btn">
+            <Plus size={18} /> New Task
+          </Link>
+        </div>
 
         {tasks.length === 0 ? (
           <p>No tasks yet</p>
         ) : (
-          <ul>
+          <div className="card-grid">
             {tasks.map((oneTask) => {
               const isDone = oneTask.status === "Completed";
               return (
-                <li key={oneTask._id}>
-                  <strong>{oneTask.title}</strong>
-                  <p>{oneTask.description}</p>
-                  <p>{oneTask.status}</p>
-                  <span>{oneTask.priority}</span>
-                  <input
-                    type="checkbox"
-                    checked={isDone}
-                    onChange={() => {
-                      handleToggleComplete(oneTask._id, oneTask.status);
-                    }}
-                  />
-                </li>
+                <div key={oneTask._id} className="card">
+                  <div className="task-header">
+                    <h4 className={isDone ? "status-Completed" : ""}>
+                      {oneTask.title}
+                    </h4>
+                    <span
+                      className={`priority-tag priority-${oneTask.priority}`}
+                    >
+                      {oneTask.priority}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: "0.9rem", color: "#666" }}>
+                    {oneTask.description}
+                  </p>
+                  {oneTask.dueDate && (
+                    <p className="task-date">
+                      <Calendar size={14} />
+                      Due: {new Date(oneTask.dueDate).toLocaleDateString()}
+                    </p>
+                  )}
+
+                  <div className="card-actions">
+                    Completed
+                    <input
+                      type="checkbox"
+                      className="custom-checkbox"
+                      checked={isDone}
+                      onChange={() =>
+                        handleToggleComplete(oneTask._id, oneTask.status)
+                      }
+                    />
+                  </div>
+                </div>
+
+                // <li key={oneTask._id}>
+                //   <strong>{oneTask.title}</strong>
+                //   <p>{oneTask.description}</p>
+                //   <p>{oneTask.status}</p>
+                //   <span>{oneTask.priority}</span>
+                //   <input
+                //     type="checkbox"
+                //     checked={isDone}
+                //     onChange={() => {
+                //       handleToggleComplete(oneTask._id, oneTask.status);
+                //     }}
+                //   />
+                // </li>
               );
             })}
-          </ul>
+          </div>
         )}
-        <Link to={"/task-list"}>All tasks</Link>
-        <Link to={"/create-task"}>Create a task</Link>
+        <div className="dashboard-footer-actions">
+          <Link to={"/task-list"} className="btn-secondary">
+            <List size={18} /> View All Tasks
+          </Link>
+          <Link to={"/create-task"} className="btn-primary">
+            <PlusCircle size={18} /> Create Task
+          </Link>
+        </div>
+        {/* <Link to={"/task-list"}>All tasks</Link>
+        <Link to={"/create-task"}>Create a task</Link> */}
 
         {groups.length === 0 ? (
           <p>No groups yet</p>
         ) : (
-          <ul>
+          <div className="card-grid">
             {groups.map((oneGroup) => {
-              const isOwner = oneGroup.createdBy?._id === currentUser._id; // checks if current user is the owner
+              const isOwner = oneGroup.createdBy?._id?.toString() === currentUser._id?.toString(); // checks if current user is the owner
 
               const myMemberEntry = oneGroup.members.find((oneMember) => {
-                return oneMember.userId?._id === currentUser._id;
+                return oneMember.userId?._id?.toString() === currentUser._id?.toString();
               });
-              const myRole =
-                myMemberEntry?.role || (isOwner ? "owner" : "member");
+              const myRole = isOwner
+                ? "Owner"
+                : myMemberEntry?.role || "Member";
               return (
-                <li key={oneGroup._id}>
-                  <strong>{oneGroup.groupName}</strong>
-                  <span> {myRole}</span>
-                  <p>Members: {oneGroup.members.length}</p>
-                  <ul>
-                    {oneGroup.members.map((oneMember) => {
-                      return (
-                        <li key={oneMember.userId?._id}>
-                          {oneMember.userId?.username}{" "}
-                          <small>{oneMember.role}</small>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                  <p>Group Tasks: {oneGroup.tasks.length}</p>
-                  {oneGroup.tasks && oneGroup.tasks.length > 0 ? (
-                    <ul>
-                      {oneGroup.tasks.map((oneTask) => {
-                        return (
-                          <li key={oneTask._id}>
-                            {oneTask.title} -<small>{oneTask.status}</small>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <p>No tasks for this group yet.</p>
-                  )}
-                  <p>Created by: {oneGroup.createdBy?.username}</p>
-                </li>
+                <div key={oneGroup._id} className="card group-card">
+                  <div className="task-header">
+                    <h4>{oneGroup.groupName}</h4>
+                    {/* Show the role as a little badge */}
+                    <span className="priority-tag priority-Low">{myRole}</span>
+                  </div>
+
+                  <div className="group-stats">
+                    <p>
+                      <Users size={14} /> {oneGroup.members.length} Members
+                    </p>
+                    <p>
+                      <List size={14} /> {oneGroup.tasks.length} Tasks
+                    </p>
+                  </div>
+
+                  <p className="created-by">
+                    By: {oneGroup.createdBy?.username}
+                  </p>
+
+                  <Link to={`/group-list`} className="view-link">
+                    View Members & Tasks <ArrowRight size={14} />
+                  </Link>
+                </div>
+
+                // <li key={oneGroup._id}>
+                //   <strong>{oneGroup.groupName}</strong>
+                //   <span> {myRole}</span>
+                //   <p>Members: {oneGroup.members.length}</p>
+                //   <ul>
+                //     {oneGroup.members.map((oneMember) => {
+                //       return (
+                //         <li key={oneMember.userId?._id}>
+                //           {oneMember.userId?.username}{" "}
+                //           <small>{oneMember.role}</small>
+                //         </li>
+                //       );
+                //     })}
+                //   </ul>
+                //   <p>Group Tasks: {oneGroup.tasks.length}</p>
+                //   {oneGroup.tasks && oneGroup.tasks.length > 0 ? (
+                //     <ul>
+                //       {oneGroup.tasks.map((oneTask) => {
+                //         return (
+                //           <li key={oneTask._id}>
+                //             {oneTask.title} -<small>{oneTask.status}</small>
+                //           </li>
+                //         );
+                //       })}
+                //     </ul>
+                //   ) : (
+                //     <p>No tasks for this group yet.</p>
+                //   )}
+                //   <p>Created by: {oneGroup.createdBy?.username}</p>
+                // </li>
               );
             })}
-          </ul>
+          </div>
         )}
-        <Link to={"/group-list"}>All groups</Link>
-        <Link to={"/create-group"}>Create a group</Link>
+        <div className="dashboard-footer-actions">
+          <Link to={"/group-list"} className="btn-secondary">
+            <Users size={18} /> View All Groups
+          </Link>
+          <Link to={"/create-group"} className="btn-primary">
+            <PlusCircle size={18} /> Create Group
+          </Link>
+        </div>
+        {/* <Link to={"/group-list"}>All groups</Link>
+        <Link to={"/create-group"}>Create a group</Link> */}
       </div>
     </>
   );
