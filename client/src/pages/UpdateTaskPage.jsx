@@ -47,6 +47,8 @@ const UpdateTaskPage = () => {
         setDescription(taskResponse.data.description);
         setStatus(taskResponse.data.status);
         setPriority(taskResponse.data.priority);
+        
+        setDueDate(taskResponse.data.dueDate ? taskResponse.data.dueDate.split("T")[0] : "");
 
         setAssignedUserIds(
           taskResponse.data.assignedUserIds.map((currentUserId) => ({
@@ -80,7 +82,7 @@ const UpdateTaskPage = () => {
     label: group.groupName,
   }));
 
-  const handleUpdateTask = async () => {
+  const handleUpdateTask = async (e) => {
     e.preventDefault();
 
     const updatedTask = {
@@ -91,7 +93,7 @@ const UpdateTaskPage = () => {
       dueDate: dueDate || null,
       // map over Ids to update in DB
       assignedUserIds: assignedUserIds.map((user) => {
-        user.value;
+        return user.value;
       }),
       assignedGroup: assignedGroup ? assignedGroup.value : null,
     };
@@ -104,7 +106,7 @@ const UpdateTaskPage = () => {
           headers: { authorization: `Bearer ${tokenForAuth}` },
         },
       );
-      nav("/task/all-tasks");
+      nav("/task-list");
     } catch (error) {
       console.error("Failed to update the task:", error);
     }

@@ -18,7 +18,7 @@ import CreateGroupPage from "./pages/CreateGroupPage";
 
 function App() {
   return (
-    <>
+    <div className="app-container">
       <Toaster
         position="top-center"
         toastOptions={{
@@ -30,80 +30,82 @@ function App() {
         }}
       />
       <Navbar />
-      <main>
-        <Routes>
-          <Route path="/" element={<SignupPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <UserProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/task-list"
-            element={
-              <ProtectedRoute>
-                <TaskListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/group-list"
-            element={
-              <ProtectedRoute>
-                <GroupListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create-task"
-            element={
-              <ProtectedRoute>
-                <CreateTaskPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/create-group"
-            element={
-              <ProtectedRoute>
-                <CreateGroupPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/update-task/:taskId"
-            element={
-              <ProtectedRoute>
-                <UpdateTaskPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/update-group/:groupId"
-            element={
-              <ProtectedRoute>
-                <UpdateGroupPage />
-              </ProtectedRoute>
-            }
-          />
+      <div className="content-area">
+        <main>
+          <Routes>
+            <Route path="/" element={<SignupPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <UserProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/task-list"
+              element={
+                <ProtectedRoute>
+                  <TaskListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/group-list"
+              element={
+                <ProtectedRoute>
+                  <GroupListPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create-task"
+              element={
+                <ProtectedRoute>
+                  <CreateTaskPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/create-group"
+              element={
+                <ProtectedRoute>
+                  <CreateGroupPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/update-task/:taskId"
+              element={
+                <ProtectedRoute>
+                  <UpdateTaskPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/update-group/:groupId"
+              element={
+                <ProtectedRoute>
+                  <UpdateGroupPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </main>
-      <Footer />
-    </>
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </div>
   );
 }
 

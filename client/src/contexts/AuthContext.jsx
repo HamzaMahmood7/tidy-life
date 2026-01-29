@@ -17,19 +17,16 @@ const AuthWrapper = ({ children }) => {
     const tokenInStorage = localStorage.getItem("authToken");
     try {
       if (tokenInStorage) {
-        const loggedInUser = await axios.get(
-          `${API_URL}/auth/verify`,
-          {
-            headers: {
-              authorization: `Bearer ${tokenInStorage}`,
-            },
+        const loggedInUser = await axios.get(`${API_URL}/auth/verify`, {
+          headers: {
+            authorization: `Bearer ${tokenInStorage}`,
           },
-        );
+        });
 
-        console.log(loggedInUser.data)
-        setCurrentUser(loggedInUser.data.currentLoggedInUser)
-        setIsLoading(false)
-        setIsLoggedIn(true)
+        console.log(loggedInUser.data);
+        setCurrentUser(loggedInUser.data.currentLoggedInUser);
+        setIsLoading(false);
+        setIsLoggedIn(true);
       } else {
         setCurrentUser(null);
         setIsLoading(false);
@@ -46,16 +43,28 @@ const AuthWrapper = ({ children }) => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-  }
+    localStorage.removeItem("authToken");
 
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+
+    nav("/login");
+  };
 
   useEffect(() => {
-    authenticateUser()
-  }, [])
+    authenticateUser();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, isLoading, isLoggedIn, authenticateUser, handleLogout}}>
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        isLoading,
+        isLoggedIn,
+        authenticateUser,
+        handleLogout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
