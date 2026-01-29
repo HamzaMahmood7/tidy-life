@@ -5,18 +5,18 @@ const GroupModel = require("../models/Group.Model");
 
 // route to create a group
 router.post("/create-group", isAuthenticated, (req, res) => {
-  const ownerId = req.payload._id // get the id from the token
+  const ownerId = req.payload._id; // get the id from the token
 
   // force the creator to be included in the members list with the role of 'owner'
   const finalMembers = [
     ...req.body.members,
-    { userId: ownerId, role: "Owner"}
+    { userId: ownerId, role: "Owner" },
   ];
 
   GroupModel.create({
     groupName: req.body.groupName,
     createdBy: ownerId,
-    members: finalMembers
+    members: finalMembers,
   })
     .then((groupData) => {
       console.log("group was created! ", groupData);
@@ -47,6 +47,25 @@ router.get("/all-groups", isAuthenticated, (req, res) => {
         .status(500)
         .json({ errorMessage: "failed to get all of the users groups" });
     });
+});
+
+// route to get the 3 groups for the dashboard page
+router.get("/dashboard-groups", isAuthenticated, async (req, res) => {
+  try {
+    const threegroups = await GroupModel.find({
+      $or: [
+        { createdBy: req.payload._id },
+        { "members.userId": req.payload._id },
+      ],
+    })
+      .limit(3)
+      .populate("createdBy", "_id username")
+      .populate("members.userId", "username");
+    res.status(200).json(threegroups);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ errorMessage: "Could not get the top 3 tasks" });
+  }
 });
 
 // route to get a single group
