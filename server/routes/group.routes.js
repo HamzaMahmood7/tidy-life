@@ -7,9 +7,11 @@ const GroupModel = require("../models/Group.Model");
 router.post("/create-group", isAuthenticated, (req, res) => {
   const ownerId = req.payload._id; // get the id from the token
 
+  const incomingMembers = req.body.members || [];
+
   // force the creator to be included in the members list with the role of 'owner'
   const finalMembers = [
-    ...req.body.members,
+    ...incomingMembers,
     { userId: ownerId, role: "Owner" },
   ];
 
