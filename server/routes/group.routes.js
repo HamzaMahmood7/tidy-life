@@ -116,19 +116,34 @@ router.patch("/:groupId", isAuthenticated, async (req, res) => {
   }
 });
 
-// route to delete a group
-router.delete("/:groupId", isAuthenticated, (req, res) => {
-  GroupModel.findByIdAndDelete(req.params.groupId)
-    .then((groupData) => {
-      console.log("deleted group: ", groupData);
-      res.status(204).json(groupData);
-    })
-    .catch((error) => {
-      console.log(error);
-      res
-        .status(500)
-        .json({ errorMessage: "failed to delete this specific group" });
-    });
+// route to delete a group and all its tasks only if the user is the owner
+router.delete("/:groupId", isAuthenticated, async (req, res) => {
+  try {
+    const group = await GroupModel.findById(req.params.groupId);
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found" });
+    }
+
+    if (String(group.createdBy) !== String(req.payload._id)) {
+      return res
+        .status(403)
+        .json({ message: "Only the owner can delete this group" });
+    }
+
+    const deletedGroup = await GroupModel.findByIdAndDelete(req.params.groupId);
+
+    await TaskModel.deleteMany({ assignedGroup: req.params.groupId });
+
+    console.log("Group and associated tasks deleted successfully");
+
+    res.status(200).json(deletedGroup);
+  } catch (error) {
+    console.error("Delete Error:", error);
+    res
+      .status(500)
+      .json({ errorMessage: "Failed to delete this specific group" });
+  }
 });
 
 module.exports = router;
