@@ -96,7 +96,7 @@ const DashboardPage = () => {
       }
     } catch (error) {
       console.log("could not update status");
-      // toast.error('could not update task status')
+      toast.error('could not update task status')
     }
   };
 
@@ -169,20 +169,6 @@ const DashboardPage = () => {
                     />
                   </div>
                 </div>
-
-                // <li key={oneTask._id}>
-                //   <strong>{oneTask.title}</strong>
-                //   <p>{oneTask.description}</p>
-                //   <p>{oneTask.status}</p>
-                //   <span>{oneTask.priority}</span>
-                //   <input
-                //     type="checkbox"
-                //     checked={isDone}
-                //     onChange={() => {
-                //       handleToggleComplete(oneTask._id, oneTask.status);
-                //     }}
-                //   />
-                // </li>
               );
             })}
           </div>
@@ -195,8 +181,6 @@ const DashboardPage = () => {
             <PlusCircle size={18} /> Create Task
           </Link>
         </div>
-        {/* <Link to={"/task-list"}>All tasks</Link>
-        <Link to={"/create-task"}>Create a task</Link> */}
 
         {groups.length === 0 ? (
           <p>No groups yet</p>
@@ -215,7 +199,6 @@ const DashboardPage = () => {
                 <div key={oneGroup._id} className="card group-card">
                   <div className="task-header">
                     <h4>{oneGroup.groupName}</h4>
-                    {/* Show the role as a little badge */}
                     <span className="priority-tag priority-Low">{myRole}</span>
                   </div>
 
@@ -236,37 +219,6 @@ const DashboardPage = () => {
                     View Members & Tasks <ArrowRight size={14} />
                   </Link>
                 </div>
-
-                // <li key={oneGroup._id}>
-                //   <strong>{oneGroup.groupName}</strong>
-                //   <span> {myRole}</span>
-                //   <p>Members: {oneGroup.members.length}</p>
-                //   <ul>
-                //     {oneGroup.members.map((oneMember) => {
-                //       return (
-                //         <li key={oneMember.userId?._id}>
-                //           {oneMember.userId?.username}{" "}
-                //           <small>{oneMember.role}</small>
-                //         </li>
-                //       );
-                //     })}
-                //   </ul>
-                //   <p>Group Tasks: {oneGroup.tasks.length}</p>
-                //   {oneGroup.tasks && oneGroup.tasks.length > 0 ? (
-                //     <ul>
-                //       {oneGroup.tasks.map((oneTask) => {
-                //         return (
-                //           <li key={oneTask._id}>
-                //             {oneTask.title} -<small>{oneTask.status}</small>
-                //           </li>
-                //         );
-                //       })}
-                //     </ul>
-                //   ) : (
-                //     <p>No tasks for this group yet.</p>
-                //   )}
-                //   <p>Created by: {oneGroup.createdBy?.username}</p>
-                // </li>
               );
             })}
           </div>
@@ -279,8 +231,6 @@ const DashboardPage = () => {
             <PlusCircle size={18} /> Create Group
           </Link>
         </div>
-        {/* <Link to={"/group-list"}>All groups</Link>
-        <Link to={"/create-group"}>Create a group</Link> */}
       </div>
     </>
   );

@@ -41,7 +41,30 @@ const GroupDetailsPage = () => {
     fetchGroupDetails();
   }, [groupId]);
 
-  // Handle Task Deletion
+  // Handle group deletion
+  const handleDeleteGroup = async () => {
+  const confirmFirst = window.confirm("Are you sure you want to delete this group?");
+  if (!confirmFirst) return;
+  
+  const confirmSecond = window.confirm("This will also delete all tasks associated with this group. Proceed?");
+  if (!confirmSecond) return;
+
+  const loadingToast = toast.loading("Deleting group...");
+  try {
+    const token = localStorage.getItem("authToken");
+    await axios.delete(`${API_URL}/group/${groupId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    toast.success("Group deleted successfully", { id: loadingToast });
+    nav("/dashboard"); 
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    toast.error("Failed to delete group", { id: loadingToast });
+  }
+};
+
+  // Handle task deletion
   const handleDeleteTask = async (taskId) => {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
 
@@ -52,7 +75,6 @@ const GroupDetailsPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Update local state so task disappears immediately
       setGroup({
         ...group,
         tasks: group.tasks.filter((t) => t._id !== taskId),
@@ -68,7 +90,6 @@ const GroupDetailsPage = () => {
   if (loading) return <p className="empty-msg">Loading group details...</p>;
   if (!group) return <p className="empty-msg">Group not found.</p>;
 
-  // Check Permissions
   const isOwner =
     String(group.createdBy?._id || group.createdBy) ===
     String(currentUser?._id);
@@ -88,14 +109,38 @@ const GroupDetailsPage = () => {
         style={{ marginBottom: "30px", borderLeft: "5px solid #ffa500" }}
       >
         <div className="task-header">
-          <h1 style={{ margin: 0 }}>{group.groupName}</h1>
+          <div className="title-group">
+            <h1 style={{ margin: 0 }}>{group.groupName}</h1>
+            <p className="created-by">
+              Created by: <strong>{group.createdBy?.username}</strong>
+            </p>
+          </div>
+        </div>
+        <div className="group-actions-wrapper">
           {isOwner && (
-            <span className="role-badge role-Owner">
-              <Shield size={12} /> Owner
-            </span>
+            <>
+              <Link
+                to={`/update-group/${groupId}`}
+                className="btn-secondary btn-edit-group"
+                
+              >
+                <Edit3 size={14} /> Edit Group
+              </Link>
+
+              <button
+                onClick={handleDeleteGroup}
+                className="icon-btn delete btn-delete-group"
+                title="Delete Group"
+              >
+                <Trash2 size={16} />
+              </button>
+
+              <span className="role-badge role-Owner">
+                <Shield size={12} /> Owner
+              </span>
+            </>
           )}
         </div>
-        <p className="created-by">Created by: {group.createdBy?.username}</p>
       </div>
 
       <div className="section-header">
@@ -177,31 +222,6 @@ const GroupDetailsPage = () => {
           </div>
         ))}
       </div>
-
-      {/* <div
-        className="card-grid"
-        style={{ gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))" }}
-      >
-        {group.members.map((member) => (
-          <div
-            key={member.userId?._id}
-            className="card"
-            style={{ padding: "15px" }}
-          >
-            <div className="task-header" style={{ marginBottom: 0 }}>
-              <strong style={{ fontSize: "0.9rem" }}>
-                {member.userId?.username}
-              </strong>
-              <small
-                className="role-badge role-Member"
-                style={{ fontSize: "0.65rem" }}
-              >
-                {member.role}
-              </small>
-            </div>
-          </div>
-        ))}
-      </div> */}
     </div>
   );
 };

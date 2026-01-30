@@ -104,37 +104,6 @@ const GroupListPage = () => {
         </button>
       </div>
     </div>
-
-    // <div>
-    //   <h2>Hi {currentUser.username}</h2>
-
-    //   <h3>Your Groups</h3>
-
-    //   {groups.length === 0 ? (
-    //     <p>No groups yet</p>
-    //   ) : (
-    //     <ul>
-    //       {groups.map((oneGroup) => {
-    //         return (
-    //           <li key={oneGroup._id}>
-    //             <strong>{oneGroup.groupName}</strong>
-    //             <p>Members: {oneGroup.members.length}</p>
-    //             <p>Created by: {oneGroup.createdBy?.username}</p>
-    //           </li>
-    //         );
-    //       })}
-    //     </ul>
-    //   )}
-
-    //   <button
-    //     type="button"
-    //     onClick={() => {
-    //       nav("/dashboard");
-    //     }}
-    //   >
-    //     Return to Dashboard
-    //   </button>
-    // </div>
   );
 };
 
