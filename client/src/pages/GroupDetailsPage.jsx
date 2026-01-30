@@ -43,26 +43,30 @@ const GroupDetailsPage = () => {
 
   // Handle group deletion
   const handleDeleteGroup = async () => {
-  const confirmFirst = window.confirm("Are you sure you want to delete this group?");
-  if (!confirmFirst) return;
-  
-  const confirmSecond = window.confirm("This will also delete all tasks associated with this group. Proceed?");
-  if (!confirmSecond) return;
+    const confirmFirst = window.confirm(
+      "Are you sure you want to delete this group?",
+    );
+    if (!confirmFirst) return;
 
-  const loadingToast = toast.loading("Deleting group...");
-  try {
-    const token = localStorage.getItem("authToken");
-    await axios.delete(`${API_URL}/group/${groupId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const confirmSecond = window.confirm(
+      "This will also delete all tasks associated with this group. Proceed?",
+    );
+    if (!confirmSecond) return;
 
-    toast.success("Group deleted successfully", { id: loadingToast });
-    nav("/dashboard"); 
-  } catch (error) {
-    console.error("Error deleting group:", error);
-    toast.error("Failed to delete group", { id: loadingToast });
-  }
-};
+    const loadingToast = toast.loading("Deleting group...");
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.delete(`${API_URL}/group/${groupId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Group deleted successfully", { id: loadingToast });
+      nav("/dashboard");
+    } catch (error) {
+      console.error("Error deleting group:", error);
+      toast.error("Failed to delete group", { id: loadingToast });
+    }
+  };
 
   // Handle task deletion
   const handleDeleteTask = async (taskId) => {
@@ -75,15 +79,16 @@ const GroupDetailsPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setGroup({
-        ...group,
-        tasks: group.tasks.filter((t) => t._id !== taskId),
-      });
+      setGroup((prev) => ({
+        ...prev,
+        tasks: prev.tasks.filter((task) => task._id !== taskId),
+      }));
 
       toast.success("Task deleted successfully", { id: loadingToast });
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete task", { id: loadingToast });
+      const message = error.response?.data?.message || "Failed to delete task";
+      toast.error(message, { id: loadingToast });
     }
   };
 
@@ -122,7 +127,6 @@ const GroupDetailsPage = () => {
               <Link
                 to={`/update-group/${groupId}`}
                 className="btn-secondary btn-edit-group"
-                
               >
                 <Edit3 size={14} /> Edit Group
               </Link>
