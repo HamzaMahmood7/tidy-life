@@ -1,8 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../../config/config";
+    import { Users as UsersIcon, Plus, ChevronLeft, ArrowRight, Shield, List } from "lucide-react";
+
 
 const GroupListPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -37,38 +39,102 @@ const GroupListPage = () => {
   }
 
   return (
-    <>
-      <div>
-        <h2>Hi {currentUser.username}</h2>
+    <div>
+      <h1 className="page-title">
+        <UsersIcon size={28} /> Your Groups
+      </h1>
 
-        <h3>Your Groups</h3>
+      <div className="section-header">
+        <h3>Collaboration Hub</h3>
+        <Link to="/create-group" className="add-btn">
+          <Plus size={18} /> New Group
+        </Link>
+      </div>
 
-        {groups.length === 0 ? (
-          <p>No groups yet</p>
-        ) : (
-          <ul>
-            {groups.map((oneGroup) => {
-              return (
-                <li key={oneGroup._id}>
-                  <strong>{oneGroup.groupName}</strong>
-                  <p>Members: {oneGroup.members.length}</p>
-                  <p>Created by: {oneGroup.createdBy?.username}</p>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+      {groups.length === 0 ? (
+        <p className="empty-msg">You aren't part of any groups yet.</p>
+      ) : (
+        <div className="card-grid">
+          {groups.map((oneGroup) => {
+            const isOwner =
+              String(oneGroup.createdBy?._id || oneGroup.createdBy) ===
+              String(currentUser?._id);
+            const myMemberEntry = oneGroup.members.find(
+              (m) =>
+                String(m.userId?._id || m.userId) === String(currentUser?._id),
+            );
+            const myRole = isOwner ? "Owner" : myMemberEntry?.role || "Member";
 
-        <button
-          type="button"
-          onClick={() => {
-            nav("/dashboard");
-          }}
-        >
-          Return to Dashboard
+            return (
+              <div key={oneGroup._id} className="card">
+                <div className="task-header">
+                  <h4>{oneGroup.groupName}</h4>
+                  <span className={`role-badge role-${myRole}`}>
+                    {myRole === "Owner" ? <Shield size={12} /> : null} {myRole}
+                  </span>
+                </div>
+
+                <div className="group-stats">
+                  <p>
+                    <UsersIcon size={14} /> {oneGroup.members.length} Members
+                  </p>
+                  <p>
+                    <List size={14} /> {oneGroup.tasks?.length || 0} Tasks
+                  </p>
+                </div>
+
+                <p className="created-by">
+                  Created by: {oneGroup.createdBy?.username || "Unknown"}
+                </p>
+
+                <div className="card-actions">
+                  <Link to={`/group/${oneGroup._id}`} className="view-link">
+                    View Group <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="dashboard-footer-actions">
+        <button onClick={() => nav("/dashboard")} className="btn-secondary">
+          <ChevronLeft size={18} /> Back to Dashboard
         </button>
       </div>
-    </>
+    </div>
+
+    // <div>
+    //   <h2>Hi {currentUser.username}</h2>
+
+    //   <h3>Your Groups</h3>
+
+    //   {groups.length === 0 ? (
+    //     <p>No groups yet</p>
+    //   ) : (
+    //     <ul>
+    //       {groups.map((oneGroup) => {
+    //         return (
+    //           <li key={oneGroup._id}>
+    //             <strong>{oneGroup.groupName}</strong>
+    //             <p>Members: {oneGroup.members.length}</p>
+    //             <p>Created by: {oneGroup.createdBy?.username}</p>
+    //           </li>
+    //         );
+    //       })}
+    //     </ul>
+    //   )}
+
+    //   <button
+    //     type="button"
+    //     onClick={() => {
+    //       nav("/dashboard");
+    //     }}
+    //   >
+    //     Return to Dashboard
+    //   </button>
+    // </div>
   );
 };
 

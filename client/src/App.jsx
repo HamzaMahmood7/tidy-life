@@ -11,10 +11,10 @@ import DashboardPage from "./pages/DashboardPage";
 import TaskListPage from "./pages/TaskListPage";
 import GroupListPage from "./pages/GroupListPage";
 import UpdateTaskPage from "./pages/UpdateTaskPage";
-import UpdateGroupPage from "./pages/UpdateGroupPage";
 import CreateTaskPage from "./pages/CreateTaskPage";
 import { Toaster } from "react-hot-toast";
 import CreateGroupPage from "./pages/CreateGroupPage";
+import GroupDetailsPage from "./pages/GroupDetailsPage";
 
 function App() {
   return (
@@ -92,10 +92,10 @@ function App() {
               }
             />
             <Route
-              path="/update-group/:groupId"
+              path="/group/:groupId"
               element={
                 <ProtectedRoute>
-                  <UpdateGroupPage />
+                  <GroupDetailsPage />
                 </ProtectedRoute>
               }
             />

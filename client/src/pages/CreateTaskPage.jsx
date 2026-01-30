@@ -1,16 +1,24 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Select from "react-select";
 import { API_URL } from "../../config/config";
+import { PlusCircle, XCircle, LayoutDashboard } from "lucide-react";
+import toast from "react-hot-toast";
 
 const CreateTaskPage = () => {
-    const nav = useNavigate()
+  const nav = useNavigate();
+
+  const [searchParams] = useSearchParams();
+  const preSelectedGroupId = searchParams.get("groupId");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("To-do");
-  const [priority, setPriority] = useState("Medium");
+  const [status, setStatus] = useState({ value: "To-do", label: "To-do" });
+  const [priority, setPriority] = useState({
+    value: "Medium",
+    label: "Medium",
+  });
   const [dueDate, setDueDate] = useState("");
   const [assignedUserIds, setAssignedUserIds] = useState([]);
   const [assignedGroup, setAssignedGroup] = useState(null);
@@ -45,7 +53,38 @@ const CreateTaskPage = () => {
     fetchUsersAndGroups();
   }, [tokenForAuth]);
 
-   // React Select options
+  useEffect(() => {
+    if (preSelectedGroupId && allGroups.length > 0) {
+      const foundGroup = allGroups.find((g) => g._id === preSelectedGroupId);
+      if (foundGroup) {
+        setAssignedGroup({
+          value: foundGroup._id,
+          label: foundGroup.groupName,
+        });
+      }
+    }
+  }, [preSelectedGroupId, allGroups]);
+
+  // This runs whenever assignedGroup changes
+  useEffect(() => {
+    if (assignedGroup && allGroups.length > 0) {
+      // Find the full group object to get the members array
+      const targetGroup = allGroups.find((g) => g._id === assignedGroup.value);
+
+      if (targetGroup && targetGroup.members) {
+        const membersToAssign = targetGroup.members.map((m) => ({
+          value: m.userId?._id || m.userId,
+          label: m.userId?.username || "Member",
+        }));
+
+        setAssignedUserIds(membersToAssign);
+      }
+    } else if (!assignedGroup) {
+      setAssignedUserIds([]);
+    }
+  }, [assignedGroup, allGroups]);
+
+  // React Select options
   const userOptions = allUsers.map((user) => ({
     value: user._id,
     label: user.username,
@@ -56,13 +95,24 @@ const CreateTaskPage = () => {
     label: group.groupName,
   }));
 
-//   const handleUserSelection = (e) => {
-//     const value = Array.from(
-//       e.target.selectedOptions,
-//       (option) => option.value,
-//     );
-//     setAssignedUserIds(value);
-//   };
+  const statusOptions = [
+    { value: "To-do", label: "To-do" },
+    { value: "In-progress", label: "In-progress" },
+    { value: "Completed", label: "Completed" },
+  ];
+  const priorityOptions = [
+    { value: "Low", label: "Low" },
+    { value: "Medium", label: "Medium" },
+    { value: "High", label: "High" },
+  ];
+
+  //   const handleUserSelection = (e) => {
+  //     const value = Array.from(
+  //       e.target.selectedOptions,
+  //       (option) => option.value,
+  //     );
+  //     setAssignedUserIds(value);
+  //   };
 
   const handleAddTask = async (e) => {
     e.preventDefault();
@@ -70,8 +120,8 @@ const CreateTaskPage = () => {
     const newTask = {
       title,
       description,
-      status,
-      priority,
+      status: status.value,
+      priority: priority.value,
       dueDate: dueDate || null,
       //   assignedUserIds: assignedUserIds || [],
       //   assignedGroup: assignedGroup,
@@ -80,147 +130,124 @@ const CreateTaskPage = () => {
     };
 
     try {
-      const res = await axios.post(
-        `${API_URL}/task/create-task`,
-        newTask,
-        {
-          headers: {
-            authorization: `Bearer ${tokenForAuth}`,
-          },
+      const res = await axios.post(`${API_URL}/task/create-task`, newTask, {
+        headers: {
+          authorization: `Bearer ${tokenForAuth}`,
         },
-      );
-      console.log("Task was successfully created!", res.data);
-      alert(`task created ${res.data.title}`)
+      });
+      toast.success("Task Created!");
+
+      if (preSelectedGroupId) {
+        // Send them back to the group they came from
+        nav(`/group/${preSelectedGroupId}`);
+      } else {
+        // Otherwise, go to dashboard
+        nav("/dashboard");
+      }
     } catch (error) {
       console.log("failed to create task: ", error);
+      toast.error("Failed to create task");
     }
   };
 
   return (
-    <>
-      <div>Create Task</div>
-      <form onSubmit={handleAddTask}>
-        <label>
-          Task Title
+    <div className="group-details-container">
+      <h1 className="page-title">
+        <PlusCircle size={28} /> Create New Task
+      </h1>
+
+      <form onSubmit={handleAddTask} className="card shadow-sm">
+        <div className="form-group">
+          <label>Task Title</label>
           <input
-            name="TaskTitle"
+            className="custom-input"
             value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
+            onChange={(e) => setTitle(e.target.value)}
             required
-            type="text"
-            placeholder="Task Title"
-          ></input>
-        </label>
-        <label>
-          Description
+            placeholder="What needs to be done?"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Description</label>
           <textarea
-            name="TaskDescription"
+            className="custom-input"
             value={description}
-            onChange={(e) => {
-              setDescription(e.target.value);
-            }}
-            type="text"
-            placeholder="Task Description"
-          ></textarea>
-        </label>
-        <label>
-          Status
-          <select
-            name="TaskStatus"
-            value={status}
-            onChange={(e) => {
-              setStatus(e.target.value);
-            }}
-            placeholder="Task Status"
-          >
-            <option value="To-do">To-do</option>
-            <option value="In-progress">In-progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </label>
-        <label>
-          Priority
-          <select
-            name="TaskPriority"
-            value={priority}
-            onChange={(e) => {
-              setPriority(e.target.value);
-            }}
-            placeholder="Task Priority"
-          >
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-          </select>
-        </label>
-        <label>
-          Due Date
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add some details..."
+          />
+        </div>
+
+        <div className="grid-2-col">
+          <div className="form-group">
+            <label>Status</label>
+            <Select
+              options={statusOptions}
+              value={status}
+              onChange={setStatus}
+            />
+          </div>
+          <div className="form-group">
+            <label>Priority</label>
+            <Select
+              options={priorityOptions}
+              value={priority}
+              onChange={setPriority}
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Due Date</label>
           <input
-            name="TaskDueDate"
-            value={dueDate}
-            onChange={(e) => {
-              setDueDate(e.target.value);
-            }}
             type="date"
-            placeholder="Task Title"
-          ></input>
-        </label>
-        <label>
-          Assign Users
+            className="custom-input"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Assign Users</label>
           <Select
             isMulti
             options={userOptions}
             value={assignedUserIds}
             onChange={setAssignedUserIds}
-            placeholder="Select users..."
           />
-        </label>
+        </div>
 
-        <label>
-          Assign Group
+        <div className="form-group">
+          <label>Assign Group</label>
           <Select
             options={groupOptions}
             value={assignedGroup}
             onChange={setAssignedGroup}
             placeholder="Select group..."
-            isClearable
+            isClearable={!preSelectedGroupId}
+            isDisabled={!!preSelectedGroupId}
           />
-        </label>
-        {/* <label>
-          Assign Users
-          <select
-            multiple
-            value={assignedUserIds}
-            onChange={handleUserSelection}
-          >
-            {allUsers.map((user) => (
-              <option key={user._id} value={user._id}>
-                {user.username}
-              </option>
-            ))}
-          </select>
-        </label>
+          {preSelectedGroupId && (
+            <small style={{ color: "#ffa500", marginTop: "4px" }}>
+              Adding task specifically to this group
+            </small>
+          )}
+        </div>
 
-        <label>
-          Assign Group
-          <select
-            value={assignedGroup || ""}
-            onChange={(e) => setAssignedGroup(e.target.value || null)}
+        <div className="dashboard-footer-actions">
+          <button type="submit" className="btn-primary">
+            <PlusCircle size={18} /> Create Task
+          </button>
+          <button
+            type="button"
+            onClick={() => nav("/dashboard")}
+            className="btn-secondary"
           >
-            <option value="">No group</option>
-            {allGroups.map((group) => (
-              <option key={group._id} value={group._id}>
-                {group.groupName}
-              </option>
-            ))}
-          </select>
-        </label> */}
-        <button type="submit">Create Task</button>
-        <button type="button" onClick={() => {nav('/dashboard')}}>Cancel</button>
+            <XCircle size={18} /> Cancel
+          </button>
+        </div>
       </form>
-    </>
+    </div>
   );
 };
 
