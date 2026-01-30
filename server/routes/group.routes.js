@@ -10,10 +10,7 @@ router.post("/create-group", isAuthenticated, (req, res) => {
   const incomingMembers = req.body.members || [];
 
   // force the creator to be included in the members list with the role of 'owner'
-  const finalMembers = [
-    ...incomingMembers,
-    { userId: ownerId, role: "Owner" },
-  ];
+  const finalMembers = [...incomingMembers, { userId: ownerId, role: "Owner" }];
 
   GroupModel.create({
     groupName: req.body.groupName,
@@ -122,10 +119,7 @@ router.patch("/:groupId", isAuthenticated, async (req, res) => {
 router.delete("/:groupId", isAuthenticated, async (req, res) => {
   try {
     const group = await GroupModel.findById(req.params.groupId);
-
-    if (!group) {
-      return res.status(404).json({ message: "Group not found" });
-    }
+    if (!group) return res.status(404).json({ message: "Group not found" });
 
     if (String(group.createdBy) !== String(req.payload._id)) {
       return res
@@ -133,18 +127,12 @@ router.delete("/:groupId", isAuthenticated, async (req, res) => {
         .json({ message: "Only the owner can delete this group" });
     }
 
-    const deletedGroup = await GroupModel.findByIdAndDelete(req.params.groupId);
-
+    await GroupModel.findByIdAndDelete(req.params.groupId);
     await TaskModel.deleteMany({ assignedGroup: req.params.groupId });
 
-    console.log("Group and associated tasks deleted successfully");
-
-    res.status(200).json(deletedGroup);
+    res.status(200).json({ message: "Deleted" });
   } catch (error) {
-    console.error("Delete Error:", error);
-    res
-      .status(500)
-      .json({ errorMessage: "Failed to delete this specific group" });
+    res.status(500).json({ message: "Server error" });
   }
 });
 

@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
 const TaskModel = require("../models/Task.Model");
-const GroupModel = require("../models/Group.Model")
+const GroupModel = require("../models/Group.Model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
 // Route to create a task
@@ -94,12 +94,30 @@ router.patch("/:taskId", isAuthenticated, async (req, res) => {
 // route to delete a task
 router.delete("/:taskId", isAuthenticated, async (req, res) => {
   try {
-    const deletedTask = await TaskModel.findByIdAndDelete(req.params.taskId);
-    console.log("task was deleted!: ", deletedTask);
-    res.status(200).json(deletedTask);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ errorMessage: "Failed to delete the task" });
+    const task = await TaskModel.findById(req.params.taskId);
+    if (!task) return res.status(404).json({ message: "Task not found" });
+
+    // If it's a group task, we need to check group ownership
+    if (task.assignedGroup) {
+      const group = await GroupModel.findById(task.assignedGroup);
+
+      // Check if the current user is the group owner
+      if (String(group.createdBy) !== String(req.payload._id)) {
+        return res
+          .status(403)
+          .json({ message: "Only the group owner can delete group tasks" });
+      }
+    } else {
+      // If it's a personal task, check if the user created the task
+      if (String(task.createdBy) !== String(req.payload._id)) {
+        return res.status(403).json({ message: "Unauthorized" });
+      }
+    }
+
+    await TaskModel.findByIdAndDelete(req.params.taskId);
+    res.status(200).json({ message: "Task deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
   }
 });
 
