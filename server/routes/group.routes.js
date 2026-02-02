@@ -101,11 +101,9 @@ router.patch("/:groupId", isAuthenticated, async (req, res) => {
 
     if (req.body.members) {
       const ownerId = String(group.createdBy);
-      const isOwnerInList = req.body.members.some(member => String(member.userId) === ownerId);
+      const isOwnerInList = req.body.members.filter(member => String(member.userId) !== ownerId);
       
-      if (!isOwnerInList) {
-        req.body.members.push({ userId: ownerId, role: "Owner" });
-      }
+      req.body.members = [{ userId: ownerId, role: "Owner" }, ...isOwnerInList];
     }
 
     const updatedGroup = await GroupModel.findByIdAndUpdate(
