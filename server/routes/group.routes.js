@@ -99,6 +99,15 @@ router.patch("/:groupId", isAuthenticated, async (req, res) => {
       return res.status(403).json({ message: "Only owner can edit" });
     }
 
+    if (req.body.members) {
+      const ownerId = String(group.createdBy);
+      const isOwnerInList = req.body.members.some(member => String(member.userId) === ownerId);
+      
+      if (!isOwnerInList) {
+        req.body.members.push({ userId: ownerId, role: "Owner" });
+      }
+    }
+
     const updatedGroup = await GroupModel.findByIdAndUpdate(
       req.params.groupId,
       req.body,
