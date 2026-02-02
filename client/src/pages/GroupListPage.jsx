@@ -3,8 +3,14 @@ import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { API_URL } from "../../config/config";
-    import { Users as UsersIcon, Plus, ChevronLeft, ArrowRight, Shield, List } from "lucide-react";
-
+import {
+  Users as UsersIcon,
+  Plus,
+  ChevronLeft,
+  ArrowRight,
+  Shield,
+  List,
+} from "lucide-react";
 
 const GroupListPage = () => {
   const { currentUser } = useContext(AuthContext);
@@ -63,7 +69,9 @@ const GroupListPage = () => {
               (m) =>
                 String(m.userId?._id || m.userId) === String(currentUser?._id),
             );
-            const myRole = isOwner ? "Owner" : myMemberEntry?.role || "Member";
+            if (!isOwner && !myMemberEntry) return null;
+
+            const myRole = isOwner ? "Owner" : myMemberEntry?.role;
 
             return (
               <div key={oneGroup._id} className="card">
