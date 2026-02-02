@@ -67,11 +67,12 @@ const CreateGroupPage = () => {
     e.preventDefault();
 
     try {
+      const tokenForAuth = localStorage.getItem("authToken");
+
       //need to match the selectedUsers list to Schema
       const membersList = selectedUsers.map((eachSelectedUser) => ({
-        userId: eachSelectedUser.value,
+        userId: eachSelectedUser.value, role: "Member"
       }));
-      const tokenForAuth = localStorage.getItem("authToken");
 
       const createdGroupRes = await axios.post(
         `${API_URL}/group/create-group`,
